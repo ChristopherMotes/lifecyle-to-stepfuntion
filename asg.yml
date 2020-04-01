@@ -1,8 +1,31 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: This creates an ASG and a mountable resource
-Parameters:
-    userName:
-        Type: String
-        Description: The main user name
-
 Resources:
+    myASG:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties: 
+            AutoScalingGroupName: !Sub asg-${AWS::StackName}
+            Cooldown: 5
+            LaunchTemplate: 
+                LaunchTemplateId: myLTID
+                LaunchTemplateName:  !Sub lt-${AWS::StackName}
+                Version: !GetAtt myLaunchTemplate.LatestVersionNumber
+            MaxSize: 2
+            MinSize: 1
+            DesiredCapacity: 1
+    myLaunchTemplate:
+        Type: AWS::EC2::LaunchTemplate
+        Properties: 
+        LaunchTemplateData: 
+            IamInstanceProfile:
+                Name: ssmRole
+            ImageId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+            InstanceType: t2.micro
+            SecurityGroupIds: !Ref securityGroupIds
+            UserData:
+                Fn::Base64:
+                    !Sub |
+                        #!/bin/bash
+                        instanceId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .instanceId)
+                        instanceRegion=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .region)
+        LaunchTemplateName: !Sub lt-${AWS::StackName}
