@@ -4,28 +4,41 @@ Resources:
     myASG:
         Type: AWS::AutoScaling::AutoScalingGroup
         Properties: 
+            AvailabilityZones: 
+                Fn::GetAZs: !Ref AWS::Region
             AutoScalingGroupName: !Sub asg-${AWS::StackName}
             Cooldown: 5
             LaunchTemplate: 
-                LaunchTemplateId: myLTID
                 LaunchTemplateName:  !Sub lt-${AWS::StackName}
                 Version: !GetAtt myLaunchTemplate.LatestVersionNumber
             MaxSize: 2
             MinSize: 1
             DesiredCapacity: 1
+
     myLaunchTemplate:
         Type: AWS::EC2::LaunchTemplate
         Properties: 
-        LaunchTemplateData: 
-            IamInstanceProfile:
-                Name: ssmRole
-            ImageId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-            InstanceType: t2.micro
-            SecurityGroupIds: !Ref securityGroupIds
-            UserData:
-                Fn::Base64:
-                    !Sub |
-                        #!/bin/bash
-                        instanceId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .instanceId)
-                        instanceRegion=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .region)
-        LaunchTemplateName: !Sub lt-${AWS::StackName}
+            LaunchTemplateData: 
+                IamInstanceProfile:
+                    Name: ssmRole
+                ImageId: ami-0e01ce4ee18447327
+                InstanceType: t2.micro
+                SecurityGroups: 
+                    - mySG
+                UserData:
+                    Fn::Base64:
+                        !Sub |
+                            #!/bin/bash
+                            instanceId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .instanceId)
+                            instanceRegion=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document |jq -r .region)
+            LaunchTemplateName: !Sub lt-${AWS::StackName}
+
+    asgScheduler:
+        Type: AWS::AutoScaling::ScheduledAction
+        Properties:
+            AutoScalingGroupName: 
+                Ref: myASG
+            MaxSize: 2
+            MinSize: 0
+            DesiredCapacity: 0
+            Recurrence: "0 20-23,0-8 * * *"
