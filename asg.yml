@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This creates an ASG and a mountable resource
+Parameters:
+    userName:
+        Type: String
+        Description: The main user name
+
+Resources:
