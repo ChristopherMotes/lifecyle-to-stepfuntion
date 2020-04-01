@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Run at new account creation
+Resources:
+    myStateMachine:
+        Type: AWS::StepFunctions::StateMachine
+        Properties: 
+        DefinitionString: |-
+        {
+            "StartAt": "HelloWorld",
+            "States": {
+                "HelloWorld": {
+                    "Type": "Pass",
+                    "End": true
+                }
+            }
+        }
+        RoleArn: String
+        StateMachineName: !Ref AWS::StackName
+        StateMachineType: STANDARD
