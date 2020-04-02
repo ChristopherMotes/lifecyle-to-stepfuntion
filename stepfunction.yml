@@ -17,6 +17,23 @@ Resources:
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
                 
+    cloudWatchEventRole:
+        Type: 'AWS::IAM::Role'
+        Properties:
+            RoleName: !Sub cw-er-${AWS::StackName}
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                        Service:
+                        - events.amazonaws.com
+                      Action:
+                        - 'sts:AssumeRole'
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+                - !Sub arn:aws:iam::${AWS::AccountId}:policy/service-role/AWS_Events_Invoke_Step_Functions_230831293
+                
     lambdaFunctionRole:
         Type: 'AWS::IAM::Role'
         Properties:
@@ -103,9 +120,10 @@ Resources:
                           }
                         }
                     - {myAsg:  'null'}
-            RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/test-role
+            RoleArn: !GetAtt cloudWatchEventRole.Arn
             State: ENABLED
             Targets: 
               - 
-                 Arn: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:test-stepfunctions
+                 Arn: !Ref myStateMachine
                  Id: myStepFunction
+                 RoleArn: !GetAtt cloudWatchEventRole.Arn
