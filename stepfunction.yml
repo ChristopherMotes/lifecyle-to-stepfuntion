@@ -1,19 +1,33 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Run at new account creation
 Resources:
+    stepFunctionRole:
+        Type: 'AWS::IAM::Role'
+        Properties:
+            RoleName: !Sub state-function-${AWS::StackName}
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                        Service:
+                        - states.amazonaws.com
+                      Action:
+                        - 'sts:AssumeRole'
+              
     myStateMachine:
         Type: AWS::StepFunctions::StateMachine
         Properties: 
-        DefinitionString: |-
-        {
-            "StartAt": "HelloWorld",
-            "States": {
-                "HelloWorld": {
-                    "Type": "Pass",
-                    "End": true
+            DefinitionString: |-
+                {
+                    "StartAt": "HelloWorld",
+                    "States": {
+                        "HelloWorld": {
+                            "Type": "Pass",
+                            "End": true
+                        }
+                    }
                 }
-            }
-        }
-        RoleArn: String
-        StateMachineName: !Ref AWS::StackName
-        StateMachineType: STANDARD
+            RoleArn: !Ref stepFunctionRole
+            StateMachineName: !Ref AWS::StackName
+            StateMachineType: STANDARD
