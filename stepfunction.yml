@@ -46,16 +46,20 @@ Resources:
     myStateMachine:
         Type: AWS::StepFunctions::StateMachine
         Properties: 
-            DefinitionString: |-
-                {
-                    "StartAt": "HelloWorld",
-                    "States": {
-                        "HelloWorld": {
-                            "Type": "Pass",
-                            "End": true
+            DefinitionString: 
+                !Sub
+                    - |-
+                        {
+                            "StartAt": "CompleteLifecycleAction",
+                            "States": {
+                                "CompleteLifecycleAction": {
+                                    "Type": "Task",
+                                    "Resource": "${completionFunctionArn}",
+                                    "End": true
+                                }
+                            }
                         }
-                    }
-                }
+                    - {completionFunctionArn: !GetAtt completionFunction.Arn }
             RoleArn: !GetAtt stepFunctionRole.Arn
             StateMachineName: !Ref AWS::StackName
             StateMachineType: STANDARD
