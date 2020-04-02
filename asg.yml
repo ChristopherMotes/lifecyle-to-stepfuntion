@@ -42,3 +42,10 @@ Resources:
             MinSize: 0
             DesiredCapacity: 0
             Recurrence: "0 20-23,0-8 * * *"
+    
+    lifeCycleHook:
+        Type: AWS::AutoScaling::LifecycleHook
+        Properties: 
+            AutoScalingGroupName: !Ref myASG
+            DefaultResult: CONTINUE
+            LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
