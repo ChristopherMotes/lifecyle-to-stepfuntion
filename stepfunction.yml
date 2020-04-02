@@ -32,7 +32,17 @@ Resources:
                         - 'sts:AssumeRole'
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-              
+                - arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess
+                - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+            Policies:
+                - PolicyName: root
+                  PolicyDocument:
+                    Version: 2012-10-17
+                    Statement:
+                      - Effect: Allow
+                        Action: autoscaling:CompleteLifecycleAction
+                        Resource: '*'
+                      
     myStateMachine:
         Type: AWS::StepFunctions::StateMachine
         Properties: 
