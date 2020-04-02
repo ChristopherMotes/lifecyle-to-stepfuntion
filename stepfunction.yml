@@ -59,3 +59,21 @@ Resources:
             RoleArn: !GetAtt stepFunctionRole.Arn
             StateMachineName: !Ref AWS::StackName
             StateMachineType: STANDARD
+    
+    completionFunction:
+        Type: AWS::Lambda::Function
+        Properties: 
+            Handler: index.handler
+            Role: !GetAtt lambdaFunctionRole.Arn
+            Code: 
+                ZipFile: |
+                    import json
+
+                    def lambda_handler(event, context):
+                        # TODO implement
+                        return {
+                            'statusCode': 200,
+                            'body': json.dumps(event)
+                        }
+            Runtime: python3.7
+            Timeout: 30
