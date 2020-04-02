@@ -81,3 +81,31 @@ Resources:
                         }
             Runtime: python3.7
             Timeout: 30
+
+    cloudWatchEventRule:    
+        Type: AWS::Events::Rule
+        Properties: 
+            Description: Envokes a state function
+            EventPattern: 
+                !Sub
+                    - |-
+                        {
+                          "source": [
+                            "aws.autoscaling"
+                          ],
+                          "detail-type": [
+                            "EC2 Instance-launch Lifecycle Action"
+                          ],
+                          "detail": {
+                            "AutoScalingGroupName": [
+                              "asg-test-enviroment"
+                            ]
+                          }
+                        }
+                    - {myAsg:  'null'}
+            RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/test-role
+            State: ENABLED
+            Targets: 
+              - 
+                 Arn: !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:test-stepfunctions
+                 Id: myStepFunction
