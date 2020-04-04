@@ -4,7 +4,7 @@ Resources:
     completionFunction:
         Type: AWS::Lambda::Function
         Properties: 
-            Handler: index.handler
+            Handler: index.lambda_handler
             Role: !GetAtt lambdaFunctionRole.Arn
             Code: 
                 ZipFile: |
