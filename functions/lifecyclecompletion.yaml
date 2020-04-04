@@ -2,7 +2,8 @@ completionFunction:
     Type: AWS::Lambda::Function
     Properties: 
         Handler: index.lambda_handler
-        Role: Fn::GetAtt [lambdaFunctionRole, Arn]
+        Role: 
+            Fn::GetAtt: [ lambdaFunctionRole, Arn ]
         Code: 
             ZipFile: |
                 import json
