@@ -10,7 +10,7 @@ Properties:
             from botocore.exceptions import ClientError
             
             def lambda_handler(event, context):
-                client = boto3.lient('autoscaling')
+                client = boto3.client('autoscaling')
                 details = event['detail']
                 try:
                     response = client.complete_lifecycle_action(
