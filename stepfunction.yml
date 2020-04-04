@@ -84,7 +84,7 @@ Resources:
     'Fn::Transform':
         Name: 'AWS::Include'
         Parameters:
-            Location: 's3://cf-templates-c90ohd0yexcx-us-east-2/completion.yml'
+            Location: 's3://cf-templates-c90ohd0yexcx-us-east-2/functions/lifecyclecompletion.yaml'
 
     cloudWatchEventRule:    
         Type: AWS::Events::Rule
