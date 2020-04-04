@@ -1,48 +1,47 @@
-completionFunction:
-    Type: AWS::Lambda::Function
-    Properties: 
-        Handler: index.lambda_handler
-        Role: 
-            Fn::GetAtt: [ lambdaFunctionRole, Arn ]
-        Code: 
-            ZipFile: |
-                import json
-                import boto3
-                from botocore.exceptions import ClientError
-                
-                def lambda_handler(event, context):
-                    client = boto3.lient('autoscaling')
-                    details = event['detail']
-                    try:
-                        response = client.complete_lifecycle_action(
-                            LifecycleHookName=details['LifecycleHookName'],
-                            AutoScalingGroupName=details['AutoScalingGroupName'],
-                            LifecycleActionToken=details['LifecycleActionToken'],
-                            LifecycleActionResult='CONTINUE',
-                            InstanceId=details['EC2InstanceId']
-                        )
-                    except ClientError as errorMessage:
-                        if errorMessage.response['Error']['Message'].startswith('No active Lifecycle Action found with token'):
-                            return {
-                                "status": 202,
-                                "body":  errorMessage.response['Error']['Message']
-                            }
-                        else:
-                            print(errorMessage.response)
-                            return {
-                                "status": 403,
-                                "body":  'Forbiden'
-                            }
-                    except Exception as errorMessage:
+Type: AWS::Lambda::Function
+Properties: 
+    Handler: index.lambda_handler
+    Role: 
+        Fn::GetAtt: [ lambdaFunctionRole, Arn ]
+    Code: 
+        ZipFile: |
+            import json
+            import boto3
+            from botocore.exceptions import ClientError
+            
+            def lambda_handler(event, context):
+                client = boto3.lient('autoscaling')
+                details = event['detail']
+                try:
+                    response = client.complete_lifecycle_action(
+                        LifecycleHookName=details['LifecycleHookName'],
+                        AutoScalingGroupName=details['AutoScalingGroupName'],
+                        LifecycleActionToken=details['LifecycleActionToken'],
+                        LifecycleActionResult='CONTINUE',
+                        InstanceId=details['EC2InstanceId']
+                    )
+                except ClientError as errorMessage:
+                    if errorMessage.response['Error']['Message'].startswith('No active Lifecycle Action found with token'):
+                        return {
+                            "status": 202,
+                            "body":  errorMessage.response['Error']['Message']
+                        }
+                    else:
                         print(errorMessage.response)
                         return {
-                                "status": 403,
-                                "body":  'Forbiden'
-                            }
-                            
+                            "status": 403,
+                            "body":  'Forbiden'
+                        }
+                except Exception as errorMessage:
+                    print(errorMessage.response)
                     return {
-                        'statusCode': 200,
-                        'body': json.dumps(response)
-                    }
-        Runtime: python3.7
-        Timeout: 30
+                            "status": 403,
+                            "body":  'Forbiden'
+                        }
+                        
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps(response)
+                }
+    Runtime: python3.7
+    Timeout: 30

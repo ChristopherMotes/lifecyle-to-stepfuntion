@@ -1,0 +1,21 @@
+Type: AWS::Lambda::Function
+Properties: 
+    Handler: index.lambda_handler
+    Role: 
+        Fn::GetAtt: [ lambdaFunctionRole, Arn ]
+    Code: 
+        ZipFile: |
+            import json
+            import boto3
+            from botocore.exceptions import ClientError
+            
+            def lambda_handler(event, context):
+                client = boto3.lient('autoscaling')
+                details = event['detail']
+                        
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps(details)
+                }
+    Runtime: python3.7
+    Timeout: 30
